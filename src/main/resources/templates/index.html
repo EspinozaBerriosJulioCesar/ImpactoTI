@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImpactoTI | Panel principal</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">IT</div>
+            <div>
+                <h2>ImpactoTI</h2>
+                <span>Soporte inteligente</span>
+            </div>
+        </div>
+
+        <p class="menu-label">MENÚ PRINCIPAL</p>
+        <a class="menu-item active" th:href="@{/}">▦ &nbsp; Panel principal</a>
+        <a class="menu-item" th:href="@{/incidencias}">▤ &nbsp; Incidencias</a>
+        <a class="menu-item" th:href="@{/incidencias/nueva}">＋ &nbsp; Registrar incidencia</a>
+
+        <div class="sidebar-bottom">
+            <span class="status-dot"></span>
+            Sistema de soporte TI
+            <small>Versión inicial</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <span class="eyebrow">TOTTUS · SOPORTE TECNOLÓGICO</span>
+                <h1>Panel principal</h1>
+                <p>Control y seguimiento de incidencias tecnológicas.</p>
+            </div>
+            <div class="user-chip">
+                <div class="avatar">IT</div>
+                <div><strong>Equipo TI</strong><small>Panel de gestión</small></div>
+            </div>
+        </header>
+
+        <section class="welcome">
+            <div>
+                <span class="welcome-tag">CENTRO DE OPERACIONES</span>
+                <h2>Bienvenido a ImpactoTI</h2>
+                <p>Centraliza las incidencias y organiza la atención según su impacto operativo y en ventas.</p>
+                <a class="primary-button" th:href="@{/incidencias/nueva}">＋ Registrar incidencia</a>
+            </div>
+            <div class="welcome-art">↗</div>
+        </section>
+
+        <section class="section-heading">
+            <div>
+                <h2>Resumen operativo</h2>
+                <p>Indicadores actualizados desde la base de datos.</p>
+            </div>
+            <span class="date-label">VISTA GENERAL</span>
+        </section>
+
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-top"><span>Total de incidencias</span><span class="stat-icon blue">▤</span></div>
+                <strong th:text="${totalIncidencias}">0</strong>
+                <p>Total de reportes registrados</p>
+            </article>
+            <article class="stat-card">
+                <div class="stat-top"><span>Prioridad crítica</span><span class="stat-icon red">!</span></div>
+                <strong th:text="${incidenciasCriticas}">0</strong>
+                <p>Incidencias críticas no resueltas</p>
+            </article>
+            <article class="stat-card">
+                <div class="stat-top"><span>En atención</span><span class="stat-icon orange">◷</span></div>
+                <strong th:text="${incidenciasEnAtencion}">0</strong>
+                <p>Incidencias en proceso</p>
+            </article>
+            <article class="stat-card">
+                <div class="stat-top"><span>Resueltas</span><span class="stat-icon green">✓</span></div>
+                <strong th:text="${incidenciasResueltas}">0</strong>
+                <p>Incidencias solucionadas</p>
+            </article>
+        </section>
+
+        <section class="content-grid">
+            <article class="panel">
+                <div class="panel-heading">
+                    <div><h2>Priorización inteligente</h2><p>Criterios orientativos para organizar la atención</p></div>
+                    <span class="pill">ImpactoTI</span>
+                </div>
+                <div class="priority-row">
+                    <span class="priority-number critical">01</span>
+                    <div><strong>Crítica</strong><p>Interrupción con alto impacto en las ventas.</p></div>
+                    <span class="priority-label red-text">Urgente</span>
+                </div>
+                <div class="priority-row">
+                    <span class="priority-number high">02</span>
+                    <div><strong>Alta</strong><p>Falla que afecta una operación importante.</p></div>
+                    <span class="priority-label orange-text">Alta</span>
+                </div>
+                <div class="priority-row">
+                    <span class="priority-number medium">03</span>
+                    <div><strong>Media</strong><p>Incidencia con afectación operativa moderada.</p></div>
+                    <span class="priority-label blue-text">Media</span>
+                </div>
+                <div class="priority-row">
+                    <span class="priority-number low">04</span>
+                    <div><strong>Baja</strong><p>Falla menor sin interrupción significativa.</p></div>
+                    <span class="priority-label green-text">Normal</span>
+                </div>
+            </article>
+
+            <article class="panel objective-panel">
+                <div class="objective-icon">◎</div>
+                <span class="eyebrow">OBJETIVO DEL PROYECTO</span>
+                <h2>Priorizar para responder mejor</h2>
+                <p>Identificar las fallas tecnológicas que pueden perjudicar más la operación de las tiendas Tottus.</p>
+                <div class="objective-divider"></div>
+                <div class="objective-item"><span>01</span> Registro centralizado</div>
+                <div class="objective-item"><span>02</span> Priorización por impacto</div>
+                <div class="objective-item"><span>03</span> Seguimiento trazable</div>
+            </article>
+        </section>
+
+        <section class="panel dashboard-incidents">
+            <div class="panel-heading">
+                <div>
+                    <h2>Últimas incidencias</h2>
+                    <p>Los cinco reportes más recientes.</p>
+                </div>
+                <a class="secondary-button" th:href="@{/incidencias}">Ver todas</a>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="incidents-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Incidencia</th>
+                            <th>Impacto en ventas</th>
+                            <th>Nivel</th>
+                            <th>Prioridad</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="incidencia : ${ultimasIncidencias}">
+                            <td th:text="${incidencia.id}">1</td>
+                            <td class="incident-cell">
+                                <strong class="incident-title" th:text="${incidencia.titulo}">Falla de caja</strong>
+                                <p class="table-description" th:text="${incidencia.descripcion}">Descripción</p>
+                            </td>
+                            <td th:text="${'S/ ' + #numbers.formatDecimal(incidencia.impactoVentas, 1, 2)}">S/ 250.00</td>
+                            <td th:text="${incidencia.nivelImpacto}">ALTO</td>
+                            <td><span class="table-badge" th:text="${incidencia.prioridad}">ALTA</span></td>
+                            <td th:text="${incidencia.estado}">RESUELTA</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(ultimasIncidencias)}">
+                            <td colspan="6" class="empty-state">
+                                Todavía no hay incidencias registradas.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>ImpactoTI · Proyecto académico · Gestión de incidencias TI</footer>
+    </main>
+</body>
+</html>

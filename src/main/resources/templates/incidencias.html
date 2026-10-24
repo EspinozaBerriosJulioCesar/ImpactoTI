@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImpactoTI | Incidencias</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">IT</div>
+            <div>
+                <h2>ImpactoTI</h2>
+                <span>Soporte inteligente</span>
+            </div>
+        </div>
+
+        <p class="menu-label">MENÚ PRINCIPAL</p>
+        <a class="menu-item" th:href="@{/}">▦ &nbsp; Panel principal</a>
+        <a class="menu-item active" th:href="@{/incidencias}">▤ &nbsp; Incidencias</a>
+        <a class="menu-item" th:href="@{/incidencias/nueva}">＋ &nbsp; Registrar incidencia</a>
+
+        <div class="sidebar-bottom">
+            <span class="status-dot"></span>
+            Sistema de soporte TI
+            <small>Versión inicial</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <span class="eyebrow">TOTTUS · SOPORTE TECNOLÓGICO</span>
+                <h1>Gestión de incidencias</h1>
+                <p>Consulta y seguimiento de las fallas tecnológicas reportadas.</p>
+            </div>
+            <a class="primary-button" th:href="@{/incidencias/nueva}">
+                ＋ Registrar incidencia
+            </a>
+        </header>
+
+        <div class="alert success-alert" th:if="${mensaje}" th:text="${mensaje}"></div>
+        <div class="alert error-alert" th:if="${error}" th:text="${error}"></div>
+
+        <section class="section-heading">
+            <div>
+                <h2>Incidencias registradas</h2>
+                <p>Información consultada desde la base de datos.</p>
+            </div>
+            <span class="date-label">
+                Total: <strong th:text="${#lists.size(incidencias)}">0</strong>
+            </span>
+        </section>
+
+        <section class="panel">
+            <div class="table-wrapper">
+                <table class="incidents-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Incidencia</th>
+                            <th>Nivel de impacto</th>
+                            <th>Impacto en ventas</th>
+                            <th>Prioridad</th>
+                            <th>Estado actual</th>
+                            <th>Actualizar estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="incidencia : ${incidencias}">
+                            <td th:text="${incidencia.id}">1</td>
+                            <td class="incident-cell">
+                                <strong class="incident-title"
+                                        th:text="${incidencia.titulo}">Falla de caja</strong>
+                                <p class="table-description"
+                                   th:text="${incidencia.descripcion}">Descripción de la incidencia</p>
+                            </td>
+                            <td th:text="${incidencia.nivelImpacto}">ALTO</td>
+                            <td th:text="${#numbers.formatDecimal(incidencia.impactoVentas, 1, 2)}">250.00</td>
+                            <td>
+                                <span class="table-badge"
+                                      th:text="${incidencia.prioridad}">MEDIA</span>
+                            </td>
+                            <td>
+                                <span th:text="${incidencia.estado}">REGISTRADA</span>
+                            </td>
+                            <td>
+                                <form th:action="@{/incidencias/actualizar-estado}" method="post">
+                                    <input type="hidden" name="id" th:value="${incidencia.id}">
+                                    <select name="estado" required>
+                                        <option value="REGISTRADA"
+                                                th:selected="${incidencia.estado == 'REGISTRADA'}">
+                                            Registrada
+                                        </option>
+                                        <option value="EN_ATENCION"
+                                                th:selected="${incidencia.estado == 'EN_ATENCION'}">
+                                            En atención
+                                        </option>
+                                        <option value="RESUELTA"
+                                                th:selected="${incidencia.estado == 'RESUELTA'}">
+                                            Resuelta
+                                        </option>
+                                    </select>
+                                    <button type="submit" class="primary-button">
+                                        Guardar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(incidencias)}">
+                            <td colspan="7" class="empty-state">
+                                <div class="empty-icon">▤</div>
+                                <strong>No hay incidencias registradas</strong>
+                                <p>Cuando se registren incidencias, aparecerán en esta tabla.</p>
+                                <a class="primary-button"
+                                   th:href="@{/incidencias/nueva}">
+                                    Registrar primera incidencia
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>ImpactoTI · Gestión de incidencias TI</footer>
+    </main>
+</body>
+</html>

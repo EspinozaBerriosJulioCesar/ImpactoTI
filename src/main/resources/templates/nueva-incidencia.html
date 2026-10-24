@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImpactoTI | Registrar incidencia</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">IT</div>
+            <div>
+                <h2>ImpactoTI</h2>
+                <span>Soporte inteligente</span>
+            </div>
+        </div>
+        <p class="menu-label">MENÚ PRINCIPAL</p>
+        <a class="menu-item" th:href="@{/}">▦ &nbsp; Panel principal</a>
+        <a class="menu-item" th:href="@{/incidencias}">▤ &nbsp; Incidencias</a>
+        <a class="menu-item active" th:href="@{/incidencias/nueva}">＋ &nbsp; Registrar incidencia</a>
+        <div class="sidebar-bottom">
+            <span class="status-dot"></span>
+            Sistema de soporte TI
+            <small>Versión inicial</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <span class="eyebrow">TOTTUS · SOPORTE TECNOLÓGICO</span>
+                <h1>Registrar incidencia</h1>
+                <p>Completa la información de la falla tecnológica.</p>
+            </div>
+        </header>
+
+        <section class="panel form-panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Datos de la incidencia</h2>
+                    <p>Los campos marcados con * son obligatorios.</p>
+                </div>
+            </div>
+
+            <form th:action="@{/incidencias/guardar}" method="post" class="incident-form">
+                <div class="form-field full-width">
+                    <label for="titulo">Título de la incidencia *</label>
+                    <input id="titulo" name="titulo" type="text" maxlength="150"
+                           placeholder="Ej. Caja registradora fuera de servicio" required>
+                </div>
+
+                <div class="form-field full-width">
+                    <label for="descripcion">Descripción del problema *</label>
+                    <textarea id="descripcion" name="descripcion" rows="4"
+                              placeholder="Describe qué ocurrió, dónde y cómo afecta la operación..."
+                              required></textarea>
+                </div>
+
+                <div class="form-field">
+                    <label for="nivelImpacto">Nivel de impacto *</label>
+                    <select id="nivelImpacto" name="nivelImpacto" required>
+                        <option value="">Selecciona el impacto</option>
+                        <option value="CRITICO">Crítico: paraliza cajas o ventas</option>
+                        <option value="ALTO">Alto: afecta una operación importante</option>
+                        <option value="MEDIO">Medio: afecta parcialmente el trabajo</option>
+                        <option value="BAJO">Bajo: afectación menor</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="impactoVentas">Impacto estimado en ventas (S/) *</label>
+                    <input id="impactoVentas" name="impactoVentas" type="number"
+                           min="0" max="9999999999.99" step="0.01" value="0.00" required>
+                    <small>Ingresa una estimación operativa; no es una cifra contable.</small>
+                </div>
+
+                <div class="form-actions full-width">
+                    <a class="secondary-button" th:href="@{/incidencias}">Cancelar</a>
+                    <button class="primary-button" type="submit">Guardar incidencia</button>
+                </div>
+            </form>
+        </section>
+
+        <footer>ImpactoTI · Gestión de incidencias TI</footer>
+    </main>
+</body>
+</html>
