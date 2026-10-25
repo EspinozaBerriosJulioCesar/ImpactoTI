@@ -50,6 +50,11 @@
             </div>
             <span class="date-label">
                 Total: <strong th:text="${#lists.size(incidencias)}">0</strong>
+                <a class="primary-button"
+                   th:href="@{/incidencias/exportar}"
+                   style="margin-left: 10px;">
+                    Exportar a Excel
+                </a>
             </span>
         </section>
 
