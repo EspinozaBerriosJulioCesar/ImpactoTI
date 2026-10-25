@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+# Archivos temporales locales
+arranque.log
+effective-pom
+effective-pom.xml
+pom.xml.respaldo
+
+src/main/resources/application.properties

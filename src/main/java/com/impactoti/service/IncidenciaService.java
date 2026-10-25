@@ -60,7 +60,7 @@ public class IncidenciaService {
         incidencia.setNivelImpacto(nivelImpacto.trim());
         incidencia.setImpactoVentas(impactoVentas);
         incidencia.setPrioridad(
-                priorizacionService.calcularPrioridad(nivelImpacto));
+                priorizacionService.calcularPrioridad(nivelImpacto, impactoVentas));
         incidencia.setEstado("REGISTRADA");
         incidencia.setUsuario(usuario);
         incidencia.setTienda(tienda);
