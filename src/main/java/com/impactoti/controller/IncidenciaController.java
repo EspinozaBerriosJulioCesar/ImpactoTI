@@ -1,18 +1,23 @@
-
 package com.impactoti.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Locale;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.impactoti.model.Equipo;
@@ -23,7 +28,8 @@ import com.impactoti.repository.EquipoRepository;
 import com.impactoti.repository.IncidenciaRepository;
 import com.impactoti.repository.TiendaRepository;
 import com.impactoti.repository.UsuarioRepository;
-import com.impactoti.service.PriorizacionService;
+import com.impactoti.service.ExcelExportService;
+import com.impactoti.service.IncidenciaService;
 
 @Controller
 @RequestMapping("/incidencias")
@@ -39,28 +45,28 @@ public class IncidenciaController {
     private final UsuarioRepository usuarioRepository;
     private final TiendaRepository tiendaRepository;
     private final EquipoRepository equipoRepository;
-    private final PriorizacionService priorizacionService;
+    private final IncidenciaService incidenciaService;
+    private final ExcelExportService excelExportService;
 
     public IncidenciaController(
             IncidenciaRepository incidenciaRepository,
             UsuarioRepository usuarioRepository,
             TiendaRepository tiendaRepository,
             EquipoRepository equipoRepository,
-            PriorizacionService priorizacionService) {
+            IncidenciaService incidenciaService,
+            ExcelExportService excelExportService) {
 
         this.incidenciaRepository = incidenciaRepository;
         this.usuarioRepository = usuarioRepository;
         this.tiendaRepository = tiendaRepository;
         this.equipoRepository = equipoRepository;
-        this.priorizacionService = priorizacionService;
+        this.incidenciaService = incidenciaService;
+        this.excelExportService = excelExportService;
     }
 
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute(
-                "incidencias",
-                incidenciaRepository.findAll());
-
+        model.addAttribute("incidencias", incidenciaRepository.findAll());
         return "incidencias";
     }
 
@@ -89,21 +95,6 @@ public class IncidenciaController {
             redirectAttributes.addFlashAttribute(
                     "error",
                     "Completa los campos obligatorios y verifica el impacto en ventas.");
-
-            return "redirect:/incidencias/nueva";
-        }
-
-        String prioridad;
-
-        try {
-            prioridad = priorizacionService.calcularPrioridad(nivelImpacto);
-        } catch (IllegalArgumentException e) {
-            log.warn("Intento de registrar incidencia con nivel de impacto inválido.");
-
-            redirectAttributes.addFlashAttribute(
-                    "error",
-                    "El nivel de impacto seleccionado no es válido.");
-
             return "redirect:/incidencias/nueva";
         }
 
@@ -117,15 +108,12 @@ public class IncidenciaController {
             redirectAttributes.addFlashAttribute(
                     "error",
                     "No se encontró el usuario o la tienda de prueba en la base de datos.");
-
             return "redirect:/incidencias/nueva";
         }
 
         if (equipo == null) {
             redirectAttributes.addFlashAttribute(
-                    "error",
-                    "El equipo seleccionado no existe.");
-
+                    "error", "El equipo seleccionado no existe.");
             return "redirect:/incidencias/nueva";
         }
 
@@ -135,33 +123,33 @@ public class IncidenciaController {
             redirectAttributes.addFlashAttribute(
                     "error",
                     "El equipo seleccionado no pertenece a la tienda asignada.");
-
             return "redirect:/incidencias/nueva";
         }
 
-        Incidencia incidencia = new Incidencia();
-        incidencia.setTitulo(titulo.trim());
-        incidencia.setDescripcion(descripcion.trim());
-        incidencia.setNivelImpacto(
-                nivelImpacto.trim().toUpperCase(Locale.ROOT));
-        incidencia.setImpactoVentas(impactoVentas);
-        incidencia.setPrioridad(prioridad);
-        incidencia.setEstado("REGISTRADA");
-        incidencia.setUsuario(usuario);
-        incidencia.setTienda(tienda);
-        incidencia.setEquipo(equipo);
+        try {
+            Incidencia guardada = incidenciaService.registrar(
+                    titulo,
+                    descripcion,
+                    nivelImpacto,
+                    impactoVentas,
+                    usuario,
+                    tienda,
+                    equipo);
 
-        Incidencia guardada = incidenciaRepository.save(incidencia);
+            log.info(
+                    "Incidencia registrada. ID={}, prioridad={}, estado={}",
+                    guardada.getId(),
+                    guardada.getPrioridad(),
+                    guardada.getEstado());
 
-        log.info(
-                "Incidencia registrada. ID={}, prioridad={}, estado={}",
-                guardada.getId(),
-                guardada.getPrioridad(),
-                guardada.getEstado());
+            redirectAttributes.addFlashAttribute(
+                    "mensaje", "Incidencia registrada correctamente.");
 
-        redirectAttributes.addFlashAttribute(
-                "mensaje",
-                "Incidencia registrada correctamente.");
+        } catch (IllegalArgumentException e) {
+            log.warn("No se pudo registrar la incidencia: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/incidencias/nueva";
+        }
 
         return "redirect:/incidencias";
     }
@@ -178,7 +166,6 @@ public class IncidenciaController {
             redirectAttributes.addFlashAttribute(
                     "error",
                     "El identificador o el estado seleccionado no es válido.");
-
             return "redirect:/incidencias";
         }
 
@@ -187,16 +174,12 @@ public class IncidenciaController {
 
         if (incidencia == null) {
             log.warn("No se encontró la incidencia con ID={}", id);
-
             redirectAttributes.addFlashAttribute(
-                    "error",
-                    "No se encontró la incidencia indicada.");
-
+                    "error", "No se encontró la incidencia indicada.");
             return "redirect:/incidencias";
         }
 
         incidencia.setEstado(estado);
-
         Incidencia actualizada = incidenciaRepository.save(incidencia);
 
         log.info(
@@ -209,5 +192,31 @@ public class IncidenciaController {
                 "Estado de la incidencia actualizado correctamente.");
 
         return "redirect:/incidencias";
+    }
+
+    @GetMapping("/exportar")
+    public ResponseEntity<byte[]> exportarExcel() {
+        try {
+            byte[] archivo = excelExportService.exportarIncidencias(
+                    incidenciaRepository.findAll());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDisposition(
+                    ContentDisposition.attachment()
+                            .filename("incidencias.xlsx")
+                            .build());
+
+            return new ResponseEntity<>(archivo, headers, HttpStatus.OK);
+
+        } catch (IOException e) {
+            log.error("Error al exportar las incidencias a Excel.", e);
+
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "No se pudo generar el archivo Excel.",
+                    e);
+        }
     }
 }
