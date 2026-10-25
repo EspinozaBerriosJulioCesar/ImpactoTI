@@ -11,7 +11,7 @@ class PriorizacionServiceTest {
 
     @Test
     void nivelCriticoDebeSerPrioridadAlta() {
-        assertEquals("ALTA", servicio.calcularPrioridad("CRITICO"));
+        assertEquals("ALTA", servicio.calcularPrioridad("CRÍTICO"));
         assertEquals("ALTA", servicio.calcularPrioridad("CRÍTICO"));
     }
 

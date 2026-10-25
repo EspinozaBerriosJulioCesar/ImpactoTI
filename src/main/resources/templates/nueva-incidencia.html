@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -15,10 +16,12 @@
                 <span>Soporte inteligente</span>
             </div>
         </div>
+
         <p class="menu-label">MENÚ PRINCIPAL</p>
         <a class="menu-item" th:href="@{/}">▦ &nbsp; Panel principal</a>
         <a class="menu-item" th:href="@{/incidencias}">▤ &nbsp; Incidencias</a>
         <a class="menu-item active" th:href="@{/incidencias/nueva}">＋ &nbsp; Registrar incidencia</a>
+
         <div class="sidebar-bottom">
             <span class="status-dot"></span>
             Sistema de soporte TI
@@ -43,18 +46,38 @@
                 </div>
             </div>
 
-            <form th:action="@{/incidencias/guardar}" method="post" class="incident-form">
+            <form th:action="@{/incidencias/guardar}"
+                  method="post"
+                  class="incident-form">
+
                 <div class="form-field full-width">
                     <label for="titulo">Título de la incidencia *</label>
-                    <input id="titulo" name="titulo" type="text" maxlength="150"
-                           placeholder="Ej. Caja registradora fuera de servicio" required>
+                    <input id="titulo"
+                           name="titulo"
+                           type="text"
+                           maxlength="150"
+                           placeholder="Ej. Caja registradora fuera de servicio"
+                           required>
                 </div>
 
                 <div class="form-field full-width">
                     <label for="descripcion">Descripción del problema *</label>
-                    <textarea id="descripcion" name="descripcion" rows="4"
+                    <textarea id="descripcion"
+                              name="descripcion"
+                              rows="4"
                               placeholder="Describe qué ocurrió, dónde y cómo afecta la operación..."
                               required></textarea>
+                </div>
+
+                <div class="form-field full-width">
+                    <label for="equipoId">Equipo afectado *</label>
+                    <select id="equipoId" name="equipoId" required>
+                        <option value="">Selecciona el equipo afectado</option>
+                        <option th:each="equipo : ${equipos}"
+                                th:value="${equipo.id}"
+                                th:text="${equipo.nombre + ' - ' + equipo.tipo + ' (' + equipo.codigoInventario + ')'}">
+                        </option>
+                    </select>
                 </div>
 
                 <div class="form-field">
@@ -70,14 +93,24 @@
 
                 <div class="form-field">
                     <label for="impactoVentas">Impacto estimado en ventas (S/) *</label>
-                    <input id="impactoVentas" name="impactoVentas" type="number"
-                           min="0" max="9999999999.99" step="0.01" value="0.00" required>
+                    <input id="impactoVentas"
+                           name="impactoVentas"
+                           type="number"
+                           min="0"
+                           max="9999999999.99"
+                           step="0.01"
+                           value="0.00"
+                           required>
                     <small>Ingresa una estimación operativa; no es una cifra contable.</small>
                 </div>
 
                 <div class="form-actions full-width">
-                    <a class="secondary-button" th:href="@{/incidencias}">Cancelar</a>
-                    <button class="primary-button" type="submit">Guardar incidencia</button>
+                    <a class="secondary-button" th:href="@{/incidencias}">
+                        Cancelar
+                    </a>
+                    <button class="primary-button" type="submit">
+                        Guardar incidencia
+                    </button>
                 </div>
             </form>
         </section>
